@@ -63,13 +63,13 @@ public class WeatherController {
         for (Weather exists : weathers) {
             if (exists.getName().equals(weather.getName()) && exists.getDate().equals(weather.getDate())) {
                 return ResponseEntity.badRequest()
-                        .body(new HashMap<>(){{put("message","This wheather is already exists, if you want to change it use PUT method");}});
+                        .body(Map.of("message","This wheather is already exists, if you want to change it use PUT method"));
             }
         }
 
         weathers.add(weather.toWeather());
 
-        return ResponseEntity.ok(new HashMap<>(){{put("message","Wheather was added successfully!");}});
+        return ResponseEntity.ok(Map.of("message","Wheather was added successfully!"));
     }
 
     @PutMapping("/{city}")
@@ -83,15 +83,15 @@ public class WeatherController {
         for (Weather exists : weathers) {
             if (exists.getName().equals(weather.getName()) && exists.getDate().equals(weather.getDate())) {
                 if (exists.getTemperature().equals(weather.getTemperature())) {
-                    return ResponseEntity.badRequest().body(new HashMap<>(){{put("message","You cant update temperature, its the same!");}});
+                    return ResponseEntity.badRequest().body(Map.of("message","You cant update temperature, its the same!"));
                 }
 
                 exists.setTemperature(weather.getTemperature());
-                return ResponseEntity.ok(new HashMap<>(){{put("message","Weather updated successfully!");}});
+                return ResponseEntity.ok(Map.of("message","Weather updated successfully!"));
             }
         }
 
-        return ResponseEntity.badRequest().body(new HashMap<>(){{put("message","Cant find info, wrong city or time!");}});
+        return ResponseEntity.badRequest().body(Map.of("message","Cant find info, wrong city or time!"));
     }
 
     @DeleteMapping("/{city}")
@@ -103,13 +103,13 @@ public class WeatherController {
         boolean deleted = weathers.removeIf(it -> it.getName().equals(city));
 
         if (deleted) {
-            return ResponseEntity.ok(new HashMap<>(){{put("message","Successfully deleted some elements");}});
+            return ResponseEntity.ok(Map.of("message","Successfully deleted some elements"));
         }
-        return ResponseEntity.badRequest().body(new HashMap<>(){{put("message","Cant find any cities");}});
+        return ResponseEntity.badRequest().body(Map.of("message","Cant find any cities"));
     }
 
     @ExceptionHandler(NullException.class)
     public ResponseEntity<Map<String, String>> nullError() {
-        return ResponseEntity.badRequest().body(new HashMap<>(){{put("message", "Incorrect input!");}});
+        return ResponseEntity.badRequest().body(Map.of("message", "Incorrect input!"));
     }
 }
