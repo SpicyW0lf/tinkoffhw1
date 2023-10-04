@@ -1,9 +1,12 @@
 package com.example.fintechspring.DTO;
 
 import com.example.fintechspring.models.Weather;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +16,10 @@ import java.time.format.DateTimeFormatter;
 @ToString
 @Schema(description = "Сущность погоды")
 public class WeatherDTO {
+    @Schema(hidden = true)
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private String name;
     @Schema(description = "Температура")
@@ -22,7 +29,7 @@ public class WeatherDTO {
 
     public WeatherDTO(Integer temperature, String date) {
         this.temperature = temperature;
-        this.date = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.date = LocalDateTime.parse(date, DATE_FORMAT);
     }
 
     public Weather toWeather() {
