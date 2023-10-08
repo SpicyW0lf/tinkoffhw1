@@ -1,0 +1,4 @@
+weather-api:
+  url: http://api.weatherapi.com/v1/current.json
+  token: 77513508c9594d5aa0490823230810
+  limit: 1000000

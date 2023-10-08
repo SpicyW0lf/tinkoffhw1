@@ -1,13 +1,14 @@
 package com.example.fintechspring.controllers;
 
 import com.example.fintechspring.DTO.ResponseDTO;
+import com.example.fintechspring.DTO.WeatherApiDTO.ApiResponse;
 import com.example.fintechspring.DTO.WeatherDTO;
+import com.example.fintechspring.exceptions.WeatherApiException;
 import com.example.fintechspring.exceptions.BadArgumentsException;
 import com.example.fintechspring.exceptions.NoArgumentException;
 import com.example.fintechspring.models.Weather;
 import com.example.fintechspring.services.WeatherService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("/api/wheather")
@@ -25,6 +27,7 @@ import java.util.*;
 public class WeatherController {
     private final List<Weather> weathers = new ArrayList<>();
     private final WeatherService service;
+    private final Function<String, ApiResponse> rateLimiter;
 
     @GetMapping("/{city}")
     @Operation(summary = "Получить погоду", description = "Возвращает все температуры за текущую дату")
@@ -34,6 +37,15 @@ public class WeatherController {
         }
 
         return ResponseEntity.ok(service.findTemperaturesForToday(weathers, city));
+    }
+
+    @GetMapping("/weather")
+    @Operation(summary = "Получить погоду с Api", description = "Получить погоду по городу с внешнего сервиса")
+    public ResponseEntity<WeatherDTO> check(@RequestParam String city) {
+        ApiResponse response = rateLimiter.apply(city);
+        WeatherDTO weatherDTO = new WeatherDTO(response.getCurrent().getTemp().intValue(), response.getCurrent().getDate());
+        weatherDTO.setName(response.getLocation().getName());
+        return ResponseEntity.ok(weatherDTO);
     }
 
     @PostMapping("/{city}")
@@ -80,5 +92,17 @@ public class WeatherController {
         throw new BadArgumentsException("Cant find any cities");
     }
 
-
+    @ExceptionHandler(WeatherApiException.class)
+    public ResponseEntity<ResponseDTO> weatherApiException(WeatherApiException ex) {
+        ResponseDTO response = new ResponseDTO(ex.getErrorResponse().getError().getMessage());
+        switch (ex.getErrorResponse().getError().getCode()) {
+            case 1003, 1005, 1006, 9000, 9001, 9999 -> {
+                return ResponseEntity.badRequest().body(response);
+            }
+            case 1002, 2006 -> {
+                return ResponseEntity.status(401).body(response);
+            }
+        }
+        return ResponseEntity.status(403).body(response);
+    }
 }

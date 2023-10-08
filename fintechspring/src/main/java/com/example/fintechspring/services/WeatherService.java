@@ -31,7 +31,6 @@ public class WeatherService {
                 return false;
             }
         }
-
         return weathers.add(weather.toWeather());
     }
 
@@ -44,7 +43,6 @@ public class WeatherService {
         }
 
         weathers.add(weather.toWeather());
-
         return false;
     }
 
