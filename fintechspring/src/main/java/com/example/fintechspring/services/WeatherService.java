@@ -1,10 +1,7 @@
 package com.example.fintechspring.services;
 
-import com.example.fintechspring.DTO.ResponseDTO;
 import com.example.fintechspring.DTO.WeatherDTO;
-import com.example.fintechspring.exceptions.BadArgumentsException;
 import com.example.fintechspring.models.Weather;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

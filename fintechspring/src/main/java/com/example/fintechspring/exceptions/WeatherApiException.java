@@ -2,9 +2,8 @@ package com.example.fintechspring.exceptions;
 
 import com.example.fintechspring.exceptions.exceptionResponse.ErrorResponse;
 
-import java.io.IOException;
 
-public class WeatherApiException extends IOException {
+public class WeatherApiException extends RuntimeException {
     private final ErrorResponse errorResponse;
 
     public WeatherApiException(ErrorResponse er) {

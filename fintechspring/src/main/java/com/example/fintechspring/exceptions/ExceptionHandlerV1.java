@@ -27,4 +27,18 @@ public class ExceptionHandlerV1 {
     public ResponseEntity<ResponseDTO> badArgumentsError(BadArgumentsException ex) {
         return ResponseEntity.badRequest().body(new ResponseDTO(ex.getMessage()));
     }
+
+    @ExceptionHandler(WeatherApiException.class)
+    public ResponseEntity<ResponseDTO> weatherApiException(WeatherApiException ex) {
+        ResponseDTO response = new ResponseDTO(ex.getErrorResponse().getError().getMessage());
+        switch (ex.getErrorResponse().getError().getCode()) {
+            case 1003, 1005, 1006, 9000, 9001, 9999 -> {
+                return ResponseEntity.badRequest().body(response);
+            }
+            case 1002, 2006 -> {
+                return ResponseEntity.status(401).body(response);
+            }
+        }
+        return ResponseEntity.status(403).body(response);
+    }
 }
