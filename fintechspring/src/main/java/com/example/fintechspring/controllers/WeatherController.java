@@ -5,9 +5,9 @@ import com.example.fintechspring.DTO.WeatherDTO;
 import com.example.fintechspring.exceptions.BadArgumentsException;
 import com.example.fintechspring.exceptions.NoArgumentException;
 import com.example.fintechspring.models.Weather;
+import com.example.fintechspring.services.WeatherApiService;
 import com.example.fintechspring.services.WeatherService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +25,7 @@ import java.util.*;
 public class WeatherController {
     private final List<Weather> weathers = new ArrayList<>();
     private final WeatherService service;
+    private final WeatherApiService weatherApiService;
 
     @GetMapping("/{city}")
     @Operation(summary = "Получить погоду", description = "Возвращает все температуры за текущую дату")
@@ -34,6 +35,12 @@ public class WeatherController {
         }
 
         return ResponseEntity.ok(service.findTemperaturesForToday(weathers, city));
+    }
+
+    @GetMapping("/weather")
+    @Operation(summary = "Получить погоду с Api", description = "Получить погоду по городу с внешнего сервиса")
+    public ResponseEntity<WeatherDTO> check(@RequestParam String city) {
+        return ResponseEntity.ok(weatherApiService.getWeatherByCity(city));
     }
 
     @PostMapping("/{city}")
@@ -79,6 +86,4 @@ public class WeatherController {
 
         throw new BadArgumentsException("Cant find any cities");
     }
-
-
 }

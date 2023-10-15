@@ -19,12 +19,12 @@ public class WeatherDTO {
     @Schema(hidden = true)
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private String name;
     @Schema(description = "Температура")
     private Integer temperature;
-    @Schema(description = "Дата и время", example = "2023-10-01 12:12:12", type = "string")
+    @Schema(description = "Дата и время", example = "2023-10-01 12:12", type = "string")
     private LocalDateTime date;
 
     public WeatherDTO(Integer temperature, String date) {
