@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Dmitry
+      comment: Add types
+      changes:
+        - insert:
+            tableName: type
+            columns:
+              - column:
+                  name: name
+                  value: Rainy
+        - insert:
+            tableName: type
+            columns:
+              - column:
+                  name: name
+                  value: Cloudy
+        - insert:
+            tableName: type
+            columns:
+              - column:
+                  name: name
+                  value: Sunny
