@@ -9,6 +9,8 @@ import com.example.fintechspring.repositories.WeatherHiberRepository;
 import com.example.fintechspring.repositories.WeatherTypeHiberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,8 +31,8 @@ public class WeatherHiberService {
         typeRepository.delete(type1);
     }
 
-    public void createType(String type) {
-        typeRepository.save(new WeatherType(type));
+    public WeatherType createType(String type) {
+        return typeRepository.save(new WeatherType(type));
     }
 
     public void updateType(String oldType, String newType) throws NoSuchElementException {
@@ -64,8 +66,10 @@ public class WeatherHiberService {
         return cityRepositoty.findAllByName(name);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createCity(CityRequest city) {
-        WeatherType type = typeRepository.findByName(city.getWeather().getType()).orElseThrow(NoSuchElementException::new);
+        WeatherType type = typeRepository.findByName(city.getWeather().getType())
+                .orElseGet(() -> createType(city.getWeather().getType()));
         WeatherEntity weather1 = weatherRepository.findByTypeAndTemperature(type, city.getWeather().getTemperature())
                 .orElseGet(() -> createWeather(city.getWeather().getTemperature(), type.getName()));
         City city1 = new City(city.getName(), city.getDate(), weather1);

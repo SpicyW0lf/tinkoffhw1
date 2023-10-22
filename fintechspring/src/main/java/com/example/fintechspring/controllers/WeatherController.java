@@ -2,10 +2,14 @@ package com.example.fintechspring.controllers;
 
 import com.example.fintechspring.DTO.ResponseDTO;
 import com.example.fintechspring.DTO.WeatherDTO;
+import com.example.fintechspring.DTO.WeatherDataDTO.CityRequest;
+import com.example.fintechspring.DTO.WeatherDataDTO.WeatherRequest;
 import com.example.fintechspring.exceptions.BadArgumentsException;
 import com.example.fintechspring.exceptions.NoArgumentException;
 import com.example.fintechspring.models.Weather;
 import com.example.fintechspring.services.WeatherApiService;
+import com.example.fintechspring.services.WeatherHiberService;
+import com.example.fintechspring.services.WeatherJdbcService;
 import com.example.fintechspring.services.WeatherService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +30,8 @@ public class WeatherController {
     private final List<Weather> weathers = new ArrayList<>();
     private final WeatherService service;
     private final WeatherApiService weatherApiService;
+    private final WeatherJdbcService jdbcService;
+    private final WeatherHiberService hiberService;
 
     @GetMapping("/{city}")
     @Operation(summary = "Получить погоду", description = "Возвращает все температуры за текущую дату")
@@ -37,10 +43,35 @@ public class WeatherController {
         return ResponseEntity.ok(service.findTemperaturesForToday(weathers, city));
     }
 
-    @GetMapping("/weather")
-    @Operation(summary = "Получить погоду с Api", description = "Получить погоду по городу с внешнего сервиса")
-    public ResponseEntity<WeatherDTO> check(@RequestParam String city) {
-        return ResponseEntity.ok(weatherApiService.getWeatherByCity(city));
+    @GetMapping("/weather-with-jdbc")
+    @Operation(summary = "Получить погоду с Api, сохранить через jdbc", description = "Получить погоду по городу с внешнего сервиса")
+    public ResponseEntity<WeatherDTO> checkJdbc(@RequestParam String city) {
+        WeatherDTO weather = weatherApiService.getWeatherByCity(city);
+        jdbcService.createCity(new CityRequest(
+                weather.getName(),
+                weather.getDate(),
+                new WeatherRequest(
+                        weather.getTemperature(),
+                        weather.getType()
+                )
+        ));
+
+        return ResponseEntity.ok(weather);
+    }
+    @GetMapping("/weather-with-hiber")
+    @Operation(summary = "Получить погоду с Api, сохранит через хибер")
+    public ResponseEntity<WeatherDTO> checkHiber(@RequestParam String city) {
+        WeatherDTO weather = weatherApiService.getWeatherByCity(city);
+        hiberService.createCity(new CityRequest(
+                weather.getName(),
+                weather.getDate(),
+                new WeatherRequest(
+                        weather.getTemperature(),
+                        weather.getType()
+                )
+        ));
+
+        return ResponseEntity.ok(weather);
     }
 
     @PostMapping("/{city}")

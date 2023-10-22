@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      author: Dmitry
+      id: 3
+      changes:
+        - createIndex:
+            indexName: cityIndex
+            tableName: city
+            columns:
+              - column:
+                  name: name
+        - createIndex:
+            indexName: weatherIndex
+            tableName: weather
+            columns:
+              - column:
+                  name: temperature
+              - column:
+                  name: type_id

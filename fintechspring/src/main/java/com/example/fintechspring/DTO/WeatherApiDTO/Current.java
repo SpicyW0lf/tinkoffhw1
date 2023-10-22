@@ -15,4 +15,6 @@ public class Current {
     private Double temp;
     @JsonProperty("last_updated")
     private String date;
+    @JsonProperty("condition")
+    private Condition condition;
 }
