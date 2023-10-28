@@ -6,6 +6,7 @@ import com.example.fintechspring.DTO.WeatherDataDTO.WeatherRequest;
 import com.example.fintechspring.models.City;
 import com.example.fintechspring.models.WeatherEntity;
 import com.example.fintechspring.models.WeatherType;
+import com.example.fintechspring.services.CityHiberService;
 import com.example.fintechspring.services.WeatherHiberService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class WeatherHiberController {
     private final WeatherHiberService weatherService;
+    private final CityHiberService cityService;
 
     @GetMapping("/allTypes")
     public List<WeatherType> getAllTypes() {
@@ -59,26 +61,26 @@ public class WeatherHiberController {
 
     @GetMapping("/city/{city}")
     public List<City> findCities(@PathVariable String city) {
-        return weatherService.getCities(city);
+        return cityService.getCities(city);
     }
 
     @PostMapping("/city/new")
     public ResponseEntity<ResponseDTO> createCity(@RequestBody CityRequest city) {
-        weatherService.createCity(city);
+        cityService.createCity(city);
 
         return ResponseEntity.ok(new ResponseDTO("Created new city"));
     }
 
     @DeleteMapping("/city/delete")
     public ResponseEntity<ResponseDTO> deleteCity(@RequestBody CityRequest city) {
-        weatherService.deleteCity(city);
+        cityService.deleteCity(city);
 
         return ResponseEntity.ok(new ResponseDTO("The city was deleted"));
     }
 
     @PutMapping("/city/update")
     public ResponseEntity<ResponseDTO> updateWeatherInCity(@RequestBody CityRequest city) {
-        weatherService.updateWeatherInCity(city);
+        cityService.updateWeatherInCity(city);
 
         return ResponseEntity.ok(new ResponseDTO("The city was updated"));
     }

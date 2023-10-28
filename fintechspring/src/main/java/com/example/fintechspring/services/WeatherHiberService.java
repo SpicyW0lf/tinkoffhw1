@@ -51,35 +51,4 @@ public class WeatherHiberService {
         wt.addWeather(we);
         return weatherRepository.save(we);
     }
-
-    public void updateWeatherInCity(CityRequest city) {
-        City city1 = cityRepositoty.findByNameAndDate(city.getName(), city.getDate()).orElseThrow(NoSuchElementException::new);
-        WeatherEntity oldWeather = city1.getWeather();
-        oldWeather.deleteCity(city1);
-        WeatherType type = typeRepository.findByName(city.getWeather().getType()).orElseThrow(NoSuchElementException::new);
-        WeatherEntity newWeather = weatherRepository.findByTypeAndTemperature(type, city.getWeather().getTemperature())
-                .orElseGet(() -> weatherRepository.save(new WeatherEntity(city.getWeather().getTemperature(), type)));
-        newWeather.addCity(city1);
-    }
-
-    public List<City> getCities(String name) {
-        return cityRepositoty.findAllByName(name);
-    }
-
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void createCity(CityRequest city) {
-        WeatherType type = typeRepository.findByName(city.getWeather().getType())
-                .orElseGet(() -> createType(city.getWeather().getType()));
-        WeatherEntity weather1 = weatherRepository.findByTypeAndTemperature(type, city.getWeather().getTemperature())
-                .orElseGet(() -> createWeather(city.getWeather().getTemperature(), type.getName()));
-        City city1 = new City(city.getName(), city.getDate(), weather1);
-        weather1.addCity(city1);
-        cityRepositoty.save(city1);
-    }
-
-    public void deleteCity(CityRequest city) {
-        City cityc = cityRepositoty.findByNameAndDate(city.getName(), city.getDate()).orElseThrow(NoSuchElementException::new);
-        cityc.getWeather().deleteCity(cityc);
-        cityRepositoty.delete(cityc);
-    }
 }
