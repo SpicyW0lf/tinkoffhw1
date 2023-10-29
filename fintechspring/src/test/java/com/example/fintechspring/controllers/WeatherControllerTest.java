@@ -116,7 +116,7 @@ class WeatherControllerTest {
         List<Weather> weathers = new ArrayList<>();
         weather.setName("Moscow");
         weather.setDate(LocalDateTime.parse("2023-10-03T12:12:00"));
-        Mockito.when(weatherService.createWeather(weathers, weather)).thenReturn(true);
+        Mockito.when(weatherService.createWeather(Mockito.any(), Mockito.any())).thenReturn(true);
         mockMvc.perform(post("/api/wheather/Moscow")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -130,6 +130,30 @@ class WeatherControllerTest {
                 content().json("""
                                 {
                                     "message": "Wheather was added successfully!"
+                                }
+                                """)
+        );
+    }
+
+    @Test
+    void postWeatherAlreadyExists() throws Exception {
+        WeatherDTO weather = new WeatherDTO(22, "2023-10-03 12:12");
+        List<Weather> weathers = new ArrayList<>();
+        weather.setName("Moscow");
+        Mockito.when(weatherService.createWeather(Mockito.any(), Mockito.any())).thenReturn(false);
+        mockMvc.perform(post("/api/wheather/Moscow")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "temperature": 22,
+                            "date": "2023-10-03 12:12"
+                        }
+                        """)
+        ).andExpectAll(
+                status().isBadRequest(),
+                content().json("""
+                                {
+                                    "message": "This wheather is already exists, if you want to change it use PUT method"
                                 }
                                 """)
         );
