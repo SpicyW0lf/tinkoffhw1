@@ -24,8 +24,11 @@ dependencies {
 	implementation("io.github.resilience4j:resilience4j-ratelimiter:2.1.0")
 	implementation("org.liquibase:liquibase-core:4.24.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:junit-jupiter")
 	compileOnly("org.projectlombok:lombok:1.18.30")
 	compileOnly("com.h2database:h2:2.2.224")
+	runtimeOnly ("com.h2database:h2")
 	annotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 
