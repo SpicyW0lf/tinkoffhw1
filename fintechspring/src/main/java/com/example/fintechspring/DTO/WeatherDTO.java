@@ -26,6 +26,8 @@ public class WeatherDTO {
     private Integer temperature;
     @Schema(description = "Дата и время", example = "2023-10-01 12:12", type = "string")
     private LocalDateTime date;
+    @Schema(description = "Тип погоды", example = "Sunny", type = "string")
+    private String type;
 
     public WeatherDTO(Integer temperature, String date) {
         this.temperature = temperature;

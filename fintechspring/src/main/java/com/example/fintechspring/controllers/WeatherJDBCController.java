@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.Cipher;
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -21,57 +21,57 @@ public class WeatherJDBCController {
     private final WeatherJdbcService jdbcService;
 
     @GetMapping("/type/all")
-    public List<WeatherTypeJ> findAllTypes() {
+    public List<WeatherTypeJ> findAllTypes() throws SQLException {
         return jdbcService.findAllTypes();
     }
 
     @PostMapping("/type/new/{type}")
-    public ResponseEntity<ResponseDTO> createType(@PathVariable String type) {
+    public ResponseEntity<ResponseDTO> createType(@PathVariable String type) throws SQLException {
         jdbcService.createType(type);
 
         return ResponseEntity.ok(new ResponseDTO("Type created"));
     }
 
     @DeleteMapping("/type/delete/{type}")
-    public ResponseEntity<ResponseDTO> deleteType(@PathVariable String type) {
+    public ResponseEntity<ResponseDTO> deleteType(@PathVariable String type) throws SQLException {
         jdbcService.deleteType(type);
 
         return ResponseEntity.ok(new ResponseDTO("Type deleted"));
     }
 
     @PutMapping("/type/update/{oldType}")
-    public ResponseEntity<ResponseDTO> updateType(@PathVariable String oldType, @RequestParam String type) {
+    public ResponseEntity<ResponseDTO> updateType(@PathVariable String oldType, @RequestParam String type) throws SQLException {
         jdbcService.updateType(oldType, type);
 
         return ResponseEntity.ok(new ResponseDTO("Type updated"));
     }
 
     @GetMapping("/weather/all")
-    public List<WeatherJ> findAllWeather() {
+    public List<WeatherJ> findAllWeather() throws SQLException {
         return jdbcService.findAllWeather();
     }
 
     @PostMapping("/weather/new")
-    public ResponseEntity<ResponseDTO> createWeather(@RequestBody WeatherRequest wr) {
+    public ResponseEntity<ResponseDTO> createWeather(@RequestBody WeatherRequest wr) throws SQLException {
         jdbcService.createWeather(wr);
 
         return ResponseEntity.ok(new ResponseDTO("Weather created"));
     }
 
     @GetMapping("/city/all")
-    public List<CityJ> findAllCities() {
+    public List<CityJ> findAllCities() throws SQLException {
         return jdbcService.findAllCities();
     }
 
     @PostMapping("/city/new")
-    public ResponseEntity<ResponseDTO> createCity(@RequestBody CityRequest cr) {
+    public ResponseEntity<ResponseDTO> createCity(@RequestBody CityRequest cr) throws SQLException {
         jdbcService.createCity(cr);
 
         return ResponseEntity.ok(new ResponseDTO("City created"));
     }
 
     @DeleteMapping("/city/delete")
-    public ResponseEntity<ResponseDTO> deleteCity(@RequestBody CityRequest cr) {
+    public ResponseEntity<ResponseDTO> deleteCity(@RequestBody CityRequest cr) throws SQLException {
         jdbcService.deleteCity(cr);
 
         return ResponseEntity.ok(new ResponseDTO("City deleted"));

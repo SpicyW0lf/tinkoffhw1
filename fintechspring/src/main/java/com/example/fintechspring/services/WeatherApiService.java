@@ -27,6 +27,7 @@ public class WeatherApiService {
         ApiResponse response = RateLimiter.decorateFunction(rateLimiter, this::getWeather).apply(city);
         WeatherDTO weatherDTO = new WeatherDTO(response.getCurrent().getTemp().intValue(), response.getCurrent().getDate());
         weatherDTO.setName(response.getLocation().getName());
+        weatherDTO.setType(response.getCurrent().getCondition().getText());
         return weatherDTO;
     }
 
