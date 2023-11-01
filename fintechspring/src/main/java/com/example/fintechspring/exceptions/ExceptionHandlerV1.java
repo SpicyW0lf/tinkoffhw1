@@ -6,11 +6,18 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.NoSuchElementException;
+
 @RestControllerAdvice(basePackages = {"com.example.fintechspring"})
 public class ExceptionHandlerV1 {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDTO> serverError() {
         return ResponseEntity.internalServerError().body(new ResponseDTO("Internal server error"));
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ResponseDTO> noElement() {
+        return ResponseEntity.badRequest().body(new ResponseDTO("One of elements not found in DB"));
     }
 
     @ExceptionHandler(NoArgumentException.class)
