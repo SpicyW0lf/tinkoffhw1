@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 
 @Configuration
-public class Config {
+public class RateConfig {
     @Bean("template")
     public RestTemplate restTemplate(RestTemplateBuilder builder, RestTemplateResponseErrorHandler re) {
         return builder

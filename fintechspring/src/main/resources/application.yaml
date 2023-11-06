@@ -10,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
   h2:
     console:
-      enabled: true
+      enabled: false
 
 weather-api:
   url: http://api.weatherapi.com/v1/current.json
