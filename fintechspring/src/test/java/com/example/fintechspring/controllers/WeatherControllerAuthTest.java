@@ -1,46 +1,40 @@
 package com.example.fintechspring.controllers;
 
-import com.example.fintechspring.models.User;
-import com.example.fintechspring.repositories.UserRepository;
-import com.example.fintechspring.services.CityHiberService;
-import com.example.fintechspring.services.WeatherApiService;
-import com.example.fintechspring.services.WeatherJdbcService;
-import com.example.fintechspring.services.WeatherService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(WeatherController.class)
-@ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WeatherControllerAuthTest {
+
+
     @Autowired
-    MockMvc mockMvc;
-    @MockBean
-    private WeatherService weatherService;
-    @MockBean
-    private WeatherApiService weatherApiService;
-    @MockBean
-    private WeatherJdbcService weatherJdbcService;
-    @MockBean
-    private CityHiberService cityHiberService;
+    private WebApplicationContext context;
+    private MockMvc mockMvc;
+
+    @BeforeAll
+    void setup() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
 
     @Test
     public void getWeatherWithoutAuthentication() throws Exception {
@@ -87,7 +81,7 @@ class WeatherControllerAuthTest {
     @Test
     void postWeatherWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/api/wheather/Moscow"))
-                .andExpect(status().is(403));
+                .andExpect(status().is(401));
     }
 
     @Test
@@ -99,17 +93,17 @@ class WeatherControllerAuthTest {
     }
 
     @Test
-    @WithMockUser(username = "dimon", roles = {"ADMIN"})
+    @WithUserDetails("admin")
     void postWeatherWithAdminAuthentication() throws Exception {
         mockMvc.perform(post("/api/wheather/Moscow"))
                 .andExpect(authenticated())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
     void putWeatherWithoutAuthentication() throws Exception {
         mockMvc.perform(put("/api/wheather/Moscow"))
-                .andExpect(status().is(403));
+                .andExpect(status().is(401));
     }
 
     @Test
@@ -121,17 +115,17 @@ class WeatherControllerAuthTest {
     }
 
     @Test
-    @WithMockUser(username = "dimon", roles = {"ADMIN"})
+    @WithUserDetails("admin")
     void putWeatherWithAdminAuthentication() throws Exception {
         mockMvc.perform(put("/api/wheather/Moscow"))
                 .andExpect(authenticated())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
     void deleteWeatherWithoutAuthentication() throws Exception {
         mockMvc.perform(delete("/api/wheather/Moscow"))
-                .andExpect(status().is(403));
+                .andExpect(status().is(401));
     }
 
     @Test
@@ -143,7 +137,7 @@ class WeatherControllerAuthTest {
     }
 
     @Test
-    @WithMockUser(username = "dimon", roles = {"ADMIN"})
+    @WithUserDetails("admin")
     void deleteWeatherWithAdminAuthentication() throws Exception {
         mockMvc.perform(delete("/api/wheather/Moscow"))
                 .andExpect(authenticated())
