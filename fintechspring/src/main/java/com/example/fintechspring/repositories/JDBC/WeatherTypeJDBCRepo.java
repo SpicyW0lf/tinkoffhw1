@@ -111,4 +111,12 @@ public class WeatherTypeJDBCRepo {
         statement.setString(1, type);
         statement.executeUpdate();
     }
+
+    public void deleteAll() throws SQLException {
+        Connection conn = dataSource.getConnection();
+        PreparedStatement statement = conn.prepareStatement(
+                "DELETE type"
+        );
+        statement.executeUpdate();
+    }
 }

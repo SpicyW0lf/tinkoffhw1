@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:mydb
+    url: jdbc:h2:tcp://localhost:1521/test
     username: racher
     password: password
     driver-class-name: org.h2.Driver
@@ -10,9 +10,9 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
   h2:
     console:
-      enabled: false
+      enabled: true
 
 weather-api:
   url: http://api.weatherapi.com/v1/current.json
-  token: ${TOKEN}
+  token: asasdf #${TOKEN}
   limit: 1000000

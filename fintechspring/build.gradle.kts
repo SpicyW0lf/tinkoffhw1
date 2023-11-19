@@ -18,14 +18,19 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.4")
 	implementation("io.github.resilience4j:resilience4j-ratelimiter:2.1.0")
 	implementation("org.liquibase:liquibase-core:4.24.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.security:spring-security-test:6.1.5")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:junit-jupiter")
 	compileOnly("org.projectlombok:lombok:1.18.30")
 	compileOnly("com.h2database:h2:2.2.224")
+	runtimeOnly ("com.h2database:h2")
 	annotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 

@@ -15,6 +15,11 @@ public class ExceptionHandlerV1 {
         return ResponseEntity.internalServerError().body(new ResponseDTO("Internal server error"));
     }
 
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ResponseDTO> userError() {
+        return ResponseEntity.badRequest().body(new ResponseDTO("User already exists"));
+    }
+
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ResponseDTO> noElement() {
         return ResponseEntity.badRequest().body(new ResponseDTO("One of elements not found in DB"));

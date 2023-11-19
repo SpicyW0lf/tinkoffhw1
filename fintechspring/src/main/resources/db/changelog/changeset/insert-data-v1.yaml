@@ -22,3 +22,15 @@ databaseChangeLog:
               - column:
                   name: name
                   value: Sunny
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: $2y$12$KyPhnD0AYTZIw0WNFgNERukbMBHVxXJa/4Eomc5gCjYa6jojr737K
+              - column:
+                  name: role
+                  value: ADMIN
