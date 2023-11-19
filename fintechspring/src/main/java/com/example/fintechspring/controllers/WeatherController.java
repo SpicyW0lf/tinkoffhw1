@@ -116,4 +116,8 @@ public class WeatherController {
 
         throw new BadArgumentsException("Cant find any cities");
     }
+
+    public List<Weather> getWeathers() {
+        return weathers;
+    }
 }

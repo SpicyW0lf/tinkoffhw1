@@ -21,7 +21,6 @@ import java.util.Optional;
 @AllArgsConstructor
 @Repository
 public class WeatherJDBCRepo {
-    private final NamedParameterJdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
     private final RowMapper<WeatherJ> weatherMapper = (rs, rowNum) ->
         new WeatherJ(

@@ -55,6 +55,10 @@ public class WeatherJdbcService {
         return cityJDBCRepo.findAll();
     }
 
+    public WeatherTypeJ findType(String type) throws SQLException {
+        return weatherTypeJDBCRepo.findByName(type).orElseThrow(SQLException::new);
+    }
+
     public void createCity(CityRequest cr) throws SQLException {
         Connection conn = dataSource.getConnection();
         try {
@@ -69,21 +73,24 @@ public class WeatherJdbcService {
                             throw new RuntimeSQLException();
                         }
                     });
-            WeatherJ weather = weatherJDBCRepo.findByTemperatureAndType(cr.getWeather().getTemperature(), type.getId())
+            WeatherJ weather = weatherJDBCRepo.findByTemperatureAndType(cr.getWeather().getTemperature(), type.getId(), conn)
                     .orElseGet(() -> {
                         try {
-                            weatherJDBCRepo.save(new WeatherJ(cr.getWeather().getTemperature(), type.getId()));
-                            return weatherJDBCRepo.findByTemperatureAndType(cr.getWeather().getTemperature(), type.getId()).get();
+                            weatherJDBCRepo.save(new WeatherJ(cr.getWeather().getTemperature(), type.getId()), conn);
+                            return weatherJDBCRepo.findByTemperatureAndType(cr.getWeather().getTemperature(), type.getId(), conn).get();
                         } catch (SQLException ex) {
-                            throw new RuntimeSQLException();
+                            throw new RuntimeSQLException(ex.getMessage());
                         }
                     });
 
-            cityJDBCRepo.save(new CityJ(
-                    cr.getName(),
-                    cr.getDate(),
-                    weather.getId()
-            ));
+            cityJDBCRepo.save(
+                    new CityJ(
+                            cr.getName(),
+                            cr.getDate(),
+                            weather.getId()
+                    ),
+                    conn
+            );
             conn.commit();
             conn.close();
         } catch (SQLException | RuntimeSQLException ex) {

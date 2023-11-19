@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost:1521/test
+    url: jdbc:h2:mem:test # tcp://localhost:1521/test
     username: racher
     password: password
     driver-class-name: org.h2.Driver
@@ -14,5 +14,9 @@ spring:
 
 weather-api:
   url: http://api.weatherapi.com/v1/current.json
-  token: asasdf #${TOKEN}
+  token: ${TOKEN}
   limit: 1000000
+
+cache:
+  course:
+    size: 5
