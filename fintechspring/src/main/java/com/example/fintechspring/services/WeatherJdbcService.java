@@ -42,6 +42,10 @@ public class WeatherJdbcService {
         return weatherJDBCRepo.findAll();
     }
 
+    public WeatherJ findWeatherById(int id) throws SQLException {
+        return weatherJDBCRepo.findById(id);
+    }
+
     public void createWeather(WeatherRequest wr) throws SQLException {
         WeatherTypeJ type = weatherTypeJDBCRepo.findByName(wr.getType()).orElseThrow(NoSuchElementException::new);
         weatherJDBCRepo.save(new WeatherJ(wr.getTemperature(), type.getId()));
@@ -53,6 +57,10 @@ public class WeatherJdbcService {
 
     public List<CityJ> findAllCities() throws SQLException {
         return cityJDBCRepo.findAll();
+    }
+
+    public List<CityJ> findAllCitiesByName(String name) throws SQLException {
+        return cityJDBCRepo.findAllByName(name);
     }
 
     public WeatherTypeJ findType(String type) throws SQLException {
@@ -101,5 +109,9 @@ public class WeatherJdbcService {
 
     public void deleteCity(CityRequest cr) throws SQLException {
         cityJDBCRepo.deleteByNameAndDate(cr);
+    }
+
+    public void deleteCityById(int id) throws SQLException {
+        cityJDBCRepo.deleteById(id);
     }
 }

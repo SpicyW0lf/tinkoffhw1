@@ -83,4 +83,21 @@ public class WeatherJDBCRepo {
         }
         return Optional.empty();
     }
+
+    public WeatherJ findById(int id) throws SQLException {
+        try (Connection conn = dataSource.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT  * FROM weather WHERE id=?"
+            );
+            statement.setInt(1, id);
+            statement.execute();
+
+            ResultSet rs = statement.getResultSet();
+            if (rs.next()) {
+                return weatherMapper.mapRow(rs, rs.getRow());
+            }
+
+            return null;
+        }
+    }
 }

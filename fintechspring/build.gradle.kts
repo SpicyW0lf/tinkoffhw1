@@ -24,6 +24,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.4")
 	implementation("io.github.resilience4j:resilience4j-ratelimiter:2.1.0")
 	implementation("org.liquibase:liquibase-core:4.24.0")
+	implementation("org.springframework.kafka:spring-kafka:3.0.12")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test:6.1.5")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
