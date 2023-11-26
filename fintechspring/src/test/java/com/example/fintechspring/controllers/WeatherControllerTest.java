@@ -1,40 +1,34 @@
 package com.example.fintechspring.controllers;
 
-import ch.qos.logback.core.testUtil.MockInitialContext;
 import com.example.fintechspring.DTO.WeatherDTO;
-import com.example.fintechspring.DTO.WeatherDataDTO.CityRequest;
-import com.example.fintechspring.DTO.WeatherDataDTO.WeatherRequest;
 import com.example.fintechspring.models.Weather;
-import com.example.fintechspring.services.CityHiberService;
+import com.example.fintechspring.repositories.CityHiberRepository;
+import com.example.fintechspring.repositories.WeatherHiberRepository;
+import com.example.fintechspring.repositories.WeatherTypeHiberRepository;
 import com.example.fintechspring.services.WeatherApiService;
-import com.example.fintechspring.services.WeatherJdbcService;
-import com.example.fintechspring.services.WeatherService;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -42,36 +36,62 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(WeatherController.class)
-@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest
 class WeatherControllerTest {
     @Autowired
-    MockMvc mockMvc;
-    @MockBean
-    private WeatherService weatherService;
+    private WebApplicationContext context;
+    private MockMvc mockMvc;
     @MockBean
     private WeatherApiService weatherApiService;
-    @MockBean
-    private WeatherJdbcService weatherJdbcService;
-    @MockBean
-    private CityHiberService cityHiberService;
+    @Autowired
+    private WeatherHiberRepository weatherHiberRepository;
+    @Autowired
+    private WeatherController controller;
+    @Autowired
+    private WeatherTypeHiberRepository weatherTypeHiberRepository;
+    @Autowired
+    private CityHiberRepository cityHiberRepository;
+    @BeforeAll
+    void setup() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+    }
+
+    @BeforeEach
+    void clear() {
+        controller.getWeathers().clear();
+        weatherHiberRepository.deleteAll();
+        weatherTypeHiberRepository.deleteAll();
+        cityHiberRepository.deleteAll();
+    }
 
     @Test
     void getWeatherWithVariable() throws Exception {
-        List<Weather> weathers = new ArrayList<>();
+        List<Weather> weathers = controller.getWeathers();
         String city = "Moscow";
-        LocalTime time = LocalTime.MIDNIGHT;
+        LocalDateTime time = LocalDate.now().atTime(12, 12, 12);
+        weathers.add(Weather.of(city, 1, time));
+        weathers.add(Weather.of(city, 2, time.plusMinutes(1)));
+        weathers.add(Weather.of(city, 3, time.plusMinutes(2)));
 
-        Map<LocalTime, List<Integer>> result = Map.of(time, List.of(1, 2, 3));
-        Mockito.when(weatherService.findTemperaturesForToday(weathers, city)).thenReturn(result);
         mockMvc.perform(get("/api/wheather/Moscow"))
                 .andExpectAll(
                         status().isOk(),
+                content().contentType(MediaType.APPLICATION_JSON),
                         content().json("""
                         {
-                            "00:00": [1, 2, 3]
+                            "%s": [1],
+                            "%s": [2],
+                            "%s": [3]
                         }
-                        """)
+                        """.formatted(
+                                time.toLocalTime().format(DateTimeFormatter.ISO_LOCAL_TIME),
+                                time.toLocalTime().plusMinutes(1).format(DateTimeFormatter.ISO_LOCAL_TIME),
+                                time.toLocalTime().plusMinutes(2).format(DateTimeFormatter.ISO_LOCAL_TIME)
+                                )
+                        )
                 );
     }
 
@@ -82,7 +102,6 @@ class WeatherControllerTest {
         LocalTime time = LocalTime.MIDNIGHT;
 
         Map<LocalTime, List<Integer>> result = Map.of(time, List.of(1, 2, 3));
-        Mockito.when(weatherService.findTemperaturesForToday(weathers, city)).thenReturn(result);
         mockMvc.perform(get("/api/wheather/"))
                 .andExpect(status().isNotFound());
     }
@@ -93,7 +112,7 @@ class WeatherControllerTest {
         weatherDTO.setType("Sunny");
         weatherDTO.setName("Moscow");
         Mockito.when(weatherApiService.getWeatherByCity("Moscow")).thenReturn(weatherDTO);
-        Mockito.doNothing().when(weatherJdbcService).createCity(Mockito.any());
+        
         mockMvc.perform(get("/api/wheather/weather-with-jdbc?city=Moscow"))
                 .andExpectAll(
                         status().isOk(),
@@ -106,17 +125,14 @@ class WeatherControllerTest {
                                         }
                                         """)
                 );
-        Mockito.verify(weatherJdbcService).createCity(Mockito.any());
     }
 
 
     @Test
     void postWeatherCorrect() throws Exception {
         WeatherDTO weather = new WeatherDTO(22, "2023-10-03 12:12");
-        List<Weather> weathers = new ArrayList<>();
         weather.setName("Moscow");
         weather.setDate(LocalDateTime.parse("2023-10-03T12:12:00"));
-        Mockito.when(weatherService.createWeather(Mockito.any(), Mockito.any())).thenReturn(true);
         mockMvc.perform(post("/api/wheather/Moscow")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -138,9 +154,7 @@ class WeatherControllerTest {
     @Test
     void postWeatherAlreadyExists() throws Exception {
         WeatherDTO weather = new WeatherDTO(22, "2023-10-03 12:12");
-        List<Weather> weathers = new ArrayList<>();
         weather.setName("Moscow");
-        Mockito.when(weatherService.createWeather(Mockito.any(), Mockito.any())).thenReturn(false);
         mockMvc.perform(post("/api/wheather/Moscow")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
