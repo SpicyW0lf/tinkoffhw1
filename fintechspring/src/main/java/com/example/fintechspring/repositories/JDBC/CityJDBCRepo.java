@@ -73,4 +73,32 @@ public class CityJDBCRepo {
         statement.setTimestamp(2, Timestamp.valueOf(cr.getDate()));
         statement.executeUpdate();
     }
+
+    public List<CityJ> findAllByName(String name) throws SQLException {
+        try (Connection conn = dataSource.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "SELECT * FROM city WHERE name=? ORDER BY date"
+            );
+            statement.setString(1, name);
+            statement.execute();
+
+            ResultSet rs = statement.getResultSet();
+            List<CityJ> cities = new ArrayList<>();
+            while (rs.next()) {
+                cities.add(cityMapper.mapRow(rs, rs.getRow()));
+            }
+
+            return cities;
+        }
+    }
+
+    public void deleteById(int id) throws SQLException {
+        try (Connection conn = dataSource.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(
+                    "DELETE city WHERE id=?"
+            );
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        }
+    }
 }

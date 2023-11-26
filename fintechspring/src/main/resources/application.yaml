@@ -11,6 +11,20 @@ spring:
   h2:
     console:
       enabled: false
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      bootstrap-servers: localhost:29092
+      group-id: com.example
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.example.fintechspring.kafka.events
+    producer:
+      acks: -1
+      bootstrap-servers: localhost:29092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 weather-api:
   url: http://api.weatherapi.com/v1/current.json
@@ -20,3 +34,7 @@ weather-api:
 cache:
   course:
     size: 5
+
+kafka:
+  topic-name: "WeatherTopic"
+  cities: Moscow, Saint Petersburg, Samara, Sydney, New York
